@@ -1,0 +1,20 @@
+# ============================================
+# BiliBiliToolPro 官方二进制（请按 README 自行下载，勿提交）
+# ============================================
+win-x64/
+bilibili-tool-pro-*.zip
+
+# 登录凭据（敏感！切勿提交）
+cookies.json
+win-x64/cookies.json
+
+# 日志与运行时文件
+*.log
+Logs/
+win-x64/Logs/
+.bilitool-running.lock
+.bilitool-run.log
+
+# 临时文件
+*.tmp
+*.pid
