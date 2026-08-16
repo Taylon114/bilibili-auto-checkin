@@ -44,6 +44,11 @@
    已修复：watchdog 用 `-WorkingDirectory` 固定 exe 目录；notify/status 同时扫描两个位置；
    部署版 appsettings 用绝对路径。**改启动链路时不要再破坏这条。**
 9. **`run-daily.bat` 每一步都写 `%~dp0.bilitool-run.log` 追踪日志**，任务"报成功但没跑"时先看它。
+10. **appsettings.json 里的 Windows 路径必须用正斜杠或双反斜杠（2026-08-16 实测踩过）。**
+    这是 JSON 文件，单反斜杠 `F:\...` 是非法转义字符（`\P`/`\w`），会导致 exe 启动即崩溃
+    （退出码 -532462766，日志里只见 project+banner、无任何任务的 `[INF]` 日志）。必须写
+    `"path": "F:/Project/.../log.txt"` 或 `F:\\Project\\...`。exe 一启动读配置崩的排查
+    先看 stdout 有无 `BiliBiliToolPro 开始运行` + stderr 有无 `JsonReaderException`。
 
 ## 怎么测试
 
