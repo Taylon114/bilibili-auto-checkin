@@ -39,9 +39,7 @@ rem -WorkingDirectory pins the exe cwd to win-x64 so logs always land in win-x64
 echo [%date% %time%] starting tasks >> "%TRACE%"
 powershell -NoProfile -Command "$p = Start-Process -FilePath '%APP_DIR%\Ray.BiliBiliTool.Console.exe' -ArgumentList '--runTasks=""Daily&Manga&Silver2Coin&VipPrivilege&MangaPrivilege&VipBigPoint&Charge""' -WorkingDirectory '%APP_DIR%' -PassThru -NoNewWindow; if (-not $p.WaitForExit(3600000)) { $p.Kill(); Write-Host '[watchdog] Task exceeded 1 hour, killed.' } else { exit $p.ExitCode }"
 
-rem Send a notification with today's result (also covers abnormal runs).
-echo [%date% %time%] notify >> "%TRACE%"
-powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0notify.ps1"
+rem Notification removed per user request.
 
 rem Keep only the last 30 days of logs (both possible log locations).
 powershell -NoProfile -Command "foreach ($d in @('%APP_DIR%\Logs','%~dp0Logs')) { Get-ChildItem $d -Filter 'log*.txt' -ErrorAction SilentlyContinue | Where-Object { $_.LastWriteTime -lt (Get-Date).AddDays(-30) } | Remove-Item -Force -ErrorAction SilentlyContinue }"
