@@ -7,16 +7,15 @@
 
 - 核心引擎是第三方的 `RayWangQvQ/BiliBiliToolPro`（MIT），**不入库**。
   用户按 README 自行下载 `win-x64` 包放到本目录，gitignore 已排除。
-- 本仓库只含部署层的脚本：定时、开机自启、通知、状态查看。
+- 本仓库只含部署层的脚本：定时、开机自启、状态查看。
 
 ## 文件职责
 
 | 文件 | 作用 |
 |---|---|
-| `run-daily.bat` | 每日入口：防重复锁 → 带看门狗跑任务 → 通知 → 清日志 |
+| `run-daily.bat` | 每日入口：防重复锁 → 带看门狗跑任务 → 清日志 |
 | `run-daily-hidden.vbs` | 隐藏启动（异步），开机自启用 |
 | `run-daily-hidden-sync.vbs` | 隐藏启动（同步等待），计划任务用 |
-| `notify.ps1` | 读日志 → 通知（Toast 失败降级自绘窗口） |
 | `status.ps1` / `status.bat` | 状态查看：进度、Lv6 倒计时、7 天记录 |
 | `install-task.ps1` / `.cmd` | 计划任务安装（cmd 负责提权） |
 | `task-daily.xml` | 计划任务模板，含 `__ROOT__`/`__DATE__` 占位符 |
@@ -40,8 +39,8 @@
    `[Convert]::FromBase64String($x -replace "`n",'')` 会把 `-replace` 拆成两个参数，要加括号：`FromBase64String(($x -replace "`n",''))`。
 8. **exe 的日志目录随启动方式变化（2026-08-15 实测踩过）。**
    计划任务的 WorkingDirectory 是仓库根目录时，exe 的相对日志路径 `Logs/log.txt` 会写到**上级 `Logs\`**，
-   而不是 `win-x64\Logs\`，导致 notify/status 找不到 → 不弹通知。
-   已修复：watchdog 用 `-WorkingDirectory` 固定 exe 目录；notify/status 同时扫描两个位置；
+   而不是 `win-x64\Logs\`，导致 status 找不到日志。
+   已修复：watchdog 用 `-WorkingDirectory` 固定 exe 目录；status 同时扫描两个位置；
    部署版 appsettings 用绝对路径。**改启动链路时不要再破坏这条。**
 9. **`run-daily.bat` 每一步都写 `%~dp0.bilitool-run.log` 追踪日志**，任务"报成功但没跑"时先看它。
 10. **appsettings.json 里的 Windows 路径必须用正斜杠或双反斜杠（2026-08-16 实测踩过）。**
@@ -55,7 +54,6 @@
 - 本地跑 `status.ps1`（需要有 `win-x64\Logs` 下的日志，没有就造一条模拟数据）。
 - 完整回归：在有 exe 的部署目录跑 `run-daily.bat`，确认"开始运行/运行结束"成对出现、
   进程零残留、`.bilitool-running.lock` 被清理。
-- 异常分支：伪造一条只有"开始运行"没有"运行结束"的日志，`notify.ps1` 应弹"运行异常"。
 - 日志错位回归：只在上层 `Logs\` 放今天的日志（`win-x64\Logs` 留空），`status.ps1` 应仍能显示。
 
 ## 约定
